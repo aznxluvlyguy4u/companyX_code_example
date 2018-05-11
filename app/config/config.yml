@@ -1,0 +1,268 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+    - { resource: customer_db_credentials.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: en
+    database.driver:          '%database_driver%'
+    database.host:            '%database_host%'
+    database.port:            '%database_port%'
+    database.dbname.shared:   '%default_shared_database_name%'
+    database.dbname.customer: '%default_customer_database_name%'
+    database.user:            '%database_user%'
+    database.password:        '%database_password%'
+    database.charset:         '%database_charset%'
+    # source http://www.regexlib.com/Search.aspx?k=yyyy-mm&AspxAutoDetectCookieSupport=1
+    iso_date_regex:           '^((((19[0-9][0-9])|(2[0-9][0-9][0-9]))([-])(0[13578]|10|12)([-])(0[1-9]|[12][0-9]|3[01]))|(((19[0-9][0-9])|(2[0-9][0-9][0-9]))([-])(0[469]|11)([-])([0][1-9]|[12][0-9]|30))|(((19[0-9][0-9])|(2[0-9][0-9][0-9]))([-])(02)([-])(0[1-9]|1[0-9]|2[0-8]))|(([02468][048]00)([-])(02)([-])(29))|(([13579][26]00)([-])(02)([-])(29))|(([0-9][0-9][0][48])([-])(02)([-])(29))|(([0-9][0-9][2468][048])([-])(02)([-])(29))|(([0-9][0-9][13579][26])([-])(02)([-])(29)))$'
+    # source https://stackoverflow.com/questions/1896715/how-do-i-check-if-a-string-is-a-valid-md5-or-sha1-checksum-string
+    sha1_regex:               '[a-fA-F0-9]{40}'
+
+framework:
+    #esi: ~
+    #translator: { fallbacks: ['%locale%'] }
+    secret: '%secret%'
+    router:
+        resource: '%kernel.project_dir%/app/config/routing.yml'
+        strict_requirements: ~
+    form: ~
+    csrf_protection: ~
+    validation: { enable_annotations: true }
+    serializer:
+        enable_annotations: true
+        name_converter: 'serializer.name_converter.camel_case_to_snake_case'
+    property_info:
+        enabled: true
+    templating:
+        engines: ['twig']
+    default_locale: '%locale%'
+    trusted_hosts: ~
+    #trusted_proxies: ~ #deprecated Use the Request::setTrustedProxies() method instead.
+    session:
+        # https://symfony.com/doc/current/reference/configuration/framework.html#handler-id
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+    fragments: ~
+    http_method_override: true
+    assets: ~
+    php_errors:
+        log: true
+
+# Twig Configuration
+twig:
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver:   '%database_driver%'
+                host:     '%database_host%'
+                port:     '%database_port%'
+                dbname:   '%default_shared_database_name%'
+                user:     '%database_user%'
+                password: '%database_password%'
+                charset:  '%database_charset%'
+            customer:
+                driver:   '%database_driver%'
+                host:     '%database_host%'
+                port:     '%database_port%'
+                dbname:   '%default_customer_database_name%'
+                user:     '%database_user%'
+                password: '%database_password%'
+                charset:  '%database_charset%'
+
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: '%kernel.project_dir%/var/data/data.sqlite'
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #path: '%database_path%'
+
+    orm:
+        default_entity_manager: default
+        auto_generate_proxy_classes: '%kernel.debug%'
+        entity_managers:
+            default:
+                connection: default
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                mappings:
+                    AppBundle:
+                        type: "annotation"
+                    gedmo_tree:
+                        type: annotation
+                        prefix: Gedmo\Tree\Entity
+                        dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Tree/Entity"
+                        alias: GedmoTree # (optional) it will default to the name set for the mapping
+                        is_bundle: false
+                filters:
+                    softdeleteable:
+                        class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                        enabled: true
+                dql:
+                    datetime_functions:
+                        year: DoctrineExtensions\Query\Mysql\Year
+                        month: DoctrineExtensions\Query\Mysql\Month
+                        date_format: DoctrineExtensions\Query\Mysql\DateFormat
+            customer:
+                connection: customer
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                mappings:
+                    AppBundle:
+                        type: "annotation"
+                    gedmo_tree:
+                        type: annotation
+                        prefix: Gedmo\Tree\Entity
+                        dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Tree/Entity"
+                        alias: GedmoTree # (optional) it will default to the name set for the mapping
+                        is_bundle: false
+                filters:
+                    assignment_filter:
+                        class: AppBundle\Doctrine\AssignmentFilter
+                    employee_filter:
+                        class: AppBundle\Doctrine\EmployeeFilter
+                    register_filter:
+                        class: AppBundle\Doctrine\RegisterFilter
+                    department_filter:
+                        class: AppBundle\Doctrine\DepartmentFilter
+                    softdeleteable:
+                        class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                        enabled: true
+                dql:
+                    datetime_functions:
+                        year: DoctrineExtensions\Query\Mysql\Year
+                        month: DoctrineExtensions\Query\Mysql\Month
+                        date_format: DoctrineExtensions\Query\Mysql\DateFormat
+
+# Doctrine cache Configuration
+# documentation: https://github.com/doctrine/DoctrineCacheBundle
+doctrine_cache:
+    providers:
+        my_apc_cache:
+            type: apc
+            namespace: my_apc_cache_ns
+        my_array_cache:
+            type: array
+            namespace: my_array_cache_ns
+        my_file_system_cache:
+            type: file_system
+            namespace: my_file_system_cache_ns
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: '%mailer_transport%'
+    host: '%mailer_host%'
+    username: '%mailer_user%'
+    password: '%mailer_password%'
+    spool: { type: memory }
+
+# Stof Doctrine extension Configuration
+stof_doctrine_extensions:
+    orm:
+        default:
+            tree: true
+            softdeleteable: true
+            timestampable: true
+        customer:
+            tree: true
+            softdeleteable: true
+            timestampable: true
+
+# Nelmio API doc Configuration
+nelmio_api_doc:
+    areas:
+        path_patterns:
+            - ^/api(?!/docs/$)
+
+
+    documentation:
+        info:
+            title: DF4 api doc
+            version: 1.0.0
+        securityDefinitions:
+            Bearer:
+                type: apiKey
+                description: 'Value: Bearer {jwt}'
+                name: Authorization
+                in: header
+        security:
+            - Bearer: []
+
+lexik_jwt_authentication:
+    private_key_path: '%jwt_private_key_path%'
+    public_key_path:  '%jwt_public_key_path%'
+    pass_phrase:      '%jwt_key_pass_phrase%'
+    token_ttl:        '%jwt_token_ttl%'
+    user_identity_field: username
+    token_extractors:
+        authorization_header:      # look for a token as Authorization Header
+            enabled: true
+            prefix:  Bearer
+            name:    Authorization
+
+gesdinet_jwt_refresh_token:
+    ttl: '%jwt_refresh_token_ttl%'
+    firewall: api
+    refresh_token_entity: AppBundle\Entity\JwtRefreshToken
+
+# Knp Paginator configuration (using default settings)
+knp_paginator:
+    page_range: 5                      # default page range used in pagination control
+    default_options:
+        page_name: page                # page query parameter name
+        sort_field_name: sort          # sort field query parameter name
+        sort_direction_name: direction # sort direction query parameter name
+        distinct: true                 # ensure distinct results, useful when ORM queries are using GROUP BY statements
+
+# FOS RestBundle configuration
+fos_rest:
+    param_fetcher_listener: force
+    body_listener: false
+    format_listener:
+        enabled: false
+    versioning: false
+
+# NoxLogic RateLimit bundle configuration
+# documentation: https://github.com/jaytaph/RateLimitBundle
+noxlogic_rate_limit:
+    enabled:              true
+    # The storage engine where all the rates will be stored
+    storage_engine:       doctrine # One of "redis"; "memcache"; "doctrine"
+    # The redis client to use for the redis storage engine
+    redis_client:         default_client
+    # The memcache client to use for the memcache storage engine
+    memcache_client:      default
+    # The Doctrine Cache provider to use for the doctrine storage engine
+    doctrine_provider:    my_file_system_cache #my_file_system_cache # Example: my_apc_cache
+    # The HTTP status code to return when a client hits the rate limit
+    rate_response_code:   429
+    # Optional exception class that will be returned when a client hits the rate limit
+    rate_response_exception:  Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException
+    # The HTTP message to return when a client hits the rate limit
+    rate_response_message:  'You exceeded the rate limit'
+    # Should the ratelimit headers be automatically added to the response?
+    display_headers:      true
+    # What are the different header names to add
+    headers:
+        limit:                X-RateLimit-Limit
+        remaining:            X-RateLimit-Remaining
+        reset:                X-RateLimit-Reset
+    # Rate limits for paths
+    path_limits:
+     - { path: /api/v1/auth, limit: 5, period: 300 }
+     - { path: /api/v1, limit: 60, period: 60 }
+
+nelmio_cors:
+   defaults:
+       allow_credentials: false
+       allow_headers: ['Authorization', 'Content-Type']
+       allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS', 'PATCH']
+       expose_headers: []
+       max_age: 3600
+       origin_regex: true

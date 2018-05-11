@@ -1,0 +1,48 @@
+# This file is a 'template' of what your parameters.yml file should look like
+# Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
+# https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+parameters:
+    # Docker will automatically understand this hostname
+    database_host: '%env(DATABASE_HOST)%'
+    database_port: '%env(DATABASE_PORT)%'
+
+    default_shared_database_name: '%env(DEFAULT_SHARED_DATABASE_NAME)%'
+    default_customer_database_name: '%env(DEFAULT_CUSTOMER_DATABASE_NAME)%'
+    test_database_name: '%env(TEST_DATABASE_NAME)%'
+
+    database_user: '%env(DATABASE_USER)%'
+    database_password: '%env(DATABASE_PASSWORD)%'
+    database_charset: '%env(DATABASE_CHARSET)%'
+    database_driver: '%env(DATABASE_DRIVER)%'
+
+    # You should uncomment this if you want to use pdo_sqlite
+    #database_path: '%kernel.project_dir%/var/data/data.sqlite'
+
+    mailer_transport: '%env(MAILER_TRANSPORT)%'
+    mailer_host: '%env(MAILER_HOST)%'
+    mailer_user: '%env(MAILER_USER)%'
+    mailer_password: '%env(MAILER_PASSWORD)%'
+
+    # A secret key that's used to generate certain security-related tokens
+    secret: '%env(SECRET)%'
+
+    postmark_api_token: '%env(POSTMARK_API_TOKEN)%'
+    postmark_from_email: '%env(POSTMARK_FROM_EMAIL)%'
+
+    jwt_private_key_path: '%kernel.root_dir%/../var/jwt/private.pem'
+    jwt_public_key_path: '%kernel.root_dir%/../var/jwt/public.pem'
+    jwt_key_pass_phrase: '%env(JWT_KEY_PASS_PHRASE)%'
+    jwt_token_ttl: 28800
+    jwt_refresh_token_ttl: 604800
+
+    # Response settings
+    response_show_error_messages: '%env(RESPONSE_SHOW_ERROR_MESSAGES)%'
+
+    default_timezone: Europe/Amsterdam
+    default_companyX_webroot: '%env(DEFAULT_COMPANYX_WEBROOT)%'
+    default_companyX_application_name: '%env(DEFAULT_COMPANYX_APPLICATION_NAME)%'
+
+    companyX_super_user_encoder_key_length: '%env(COMPANYX_SUPER_USER_ENCODER_KEY_LENGTH)%'
+    companyX_super_user_encoder_key_word: '%env(COMPANYX_SUPER_USER_ENCODER_KEY_WORD)%'
+    companyX_super_user_encoder_key_generator_string: '%env(COMPANYX_SUPER_USER_ENCODER_KEY_GENERATOR_STRING)%'
+    companyX_super_user_encoder_sign: '%env(COMPANYX_SUPER_USER_ENCODER_SIGN)%'

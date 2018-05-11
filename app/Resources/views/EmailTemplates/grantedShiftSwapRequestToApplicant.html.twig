@@ -1,0 +1,19 @@
+<p>
+    Beste {{ shiftSwapRequest.applicant.fullName }}
+</p>
+
+<p>
+    Je ruilverzoek is geaccepteerd door {{ shiftSwapRequest.receiver.fullName }}. <b>De planner moet deze nog wel goedkeuren!</b>
+</p>
+
+{% include 'EmailTemplates/dateTimeFunction.html.twig' with { 'shiftSwapRequest': shiftSwapRequest } %}
+
+{% if shiftSwapRequest.receiverMessage %}
+    <p>
+        Bericht:
+        <br>
+        {{ shiftSwapRequest.receiverMessage }}
+    </p>
+{% endif %}
+
+<b>Zodra de planner de ruil heeft goedgekeurd ontvang je hierover een mail.</b>

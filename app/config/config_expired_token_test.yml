@@ -1,0 +1,19 @@
+imports:
+    - { resource: config_test.yml }
+
+lexik_jwt_authentication:
+    private_key_path: '%jwt_private_key_path%'
+    public_key_path:  '%jwt_public_key_path%'
+    pass_phrase:      '%jwt_key_pass_phrase%'
+    token_ttl:        0
+    user_identity_field: username
+    token_extractors:
+        authorization_header:      # look for a token as Authorization Header
+            enabled: true
+            prefix:  Bearer
+            name:    Authorization
+
+gesdinet_jwt_refresh_token:
+    ttl: '%jwt_refresh_token_ttl%'
+    firewall: api
+    refresh_token_entity: AppBundle\Entity\JwtRefreshToken

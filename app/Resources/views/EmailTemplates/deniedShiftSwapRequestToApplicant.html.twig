@@ -1,0 +1,19 @@
+<p>
+    Beste {{ shiftSwapRequest.applicant.fullName }}
+</p>
+
+<p>
+    Je ruilverzoek is afgewezen door {{ shiftSwapRequest.receiver.fullName }}. <b>Je moet de volgende dienst dus gewoon werken:</b>
+</p>
+
+{% include 'EmailTemplates/dateTimeFunction.html.twig' with { 'shiftSwapRequest': shiftSwapRequest } %}
+
+{% if shiftSwapRequest.receiverMessage %}
+    <p>
+        Bericht:
+        <br>
+        {{ shiftSwapRequest.receiverMessage }}
+    </p>
+{% endif %}
+
+Je kunt eventueel een nieuw verzoek doen op <a href="{{ webroot }}/{{ companyIdentifier }}">{{ applicationName }}</a>

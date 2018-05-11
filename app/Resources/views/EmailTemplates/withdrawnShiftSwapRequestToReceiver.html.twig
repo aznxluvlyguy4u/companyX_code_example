@@ -1,0 +1,17 @@
+<p>
+    Beste {{ shiftSwapRequest.receiver.fullName }},
+</p>
+
+<p>
+    {{ shiftSwapRequest.applicant.fullName }} heeft het ruilverzoek ingetrokken. <b>Je hoeft de volgende dienst dus niet te werken:</b>
+</p>
+
+{% include 'EmailTemplates/dateTimeFunction.html.twig' with { 'shiftSwapRequest': shiftSwapRequest } %}
+
+{% if shiftSwapRequest.applicantWithdrawalMessage %}
+    <p>
+        Bericht:
+        <br>
+        {{ shiftSwapRequest.applicantWithdrawalMessage }}
+    </p>
+{% endif %}

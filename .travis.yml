@@ -1,0 +1,44 @@
+dist: trusty
+sudo: false
+
+language: php
+
+php:
+  - '7.0'
+
+addons:
+  ssh_known_hosts:
+  - api01.companybrothers.com
+  - api02.companybrothers.com
+  - office.companybrothers.com:2200
+
+before_install:
+  # Create required databases for testing, in order: shared, customer
+  - mysql -e "create database IF NOT EXISTS admin_shared;" -uroot
+  - mysql -e "create database IF NOT EXISTS admin_companydemo;" -uroot
+  - mysql -e "grant all on *.* to 'root'@'%' identified by 'password' with grant option;" -uroot
+
+  # Load databases and set password
+  - cat database/admin_shared.sql | mysql -uroot admin_shared
+  - cat database/admin_companydemo.sql | mysql -uroot admin_companydemo
+  - mysql -e "SET PASSWORD FOR root@localhost=PASSWORD('password');" -uroot
+
+  # Generate JWT certificate
+  - mkdir -p var/jwt
+  - openssl genrsa -out var/jwt/private.pem -aes256 -passout pass:onlyfortravis 4096
+  - openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem -passin pass:onlyfortravis
+
+install:
+  - composer install --no-scripts
+  - composer run-script build-params -n
+
+before_script:
+  - phpenv config-rm xdebug.ini
+  - php bin/console server:start
+
+script:
+  - php vendor/bin/php-cs-fixer fix --dry-run
+  - vendor/bin/simple-phpunit
+
+notifications:
+  slack: companyX-jvt:rwtPyIXZsn2fwlEki5yLET1l

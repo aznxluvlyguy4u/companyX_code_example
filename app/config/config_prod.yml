@@ -1,0 +1,29 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    response.show_error_messages: '%response_show_error_messages%'
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+
+framework:
+    serializer:
+        cache: serializer.mapping.cache.apc
+
+monolog:
+    handlers:
+        main:
+            type: fingers_crossed
+            action_level: error
+            handler: nested
+        nested:
+            type: stream
+            path: '%kernel.logs_dir%/%kernel.environment%.log'
+            level: debug
+        console:
+            type: console
+            process_psr_3_messages: false

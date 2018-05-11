@@ -1,0 +1,22 @@
+<p>
+    Beste {{ shiftSwapRequest.receiver.fullName }}
+</p>
+
+<p>
+    {{ shiftSwapRequest.applicant.fullName }} heeft je een ruilverzoek gestuurd.
+</p>
+
+{% include 'EmailTemplates/dateTimeFunction.html.twig' with { 'shiftSwapRequest': shiftSwapRequest } %}
+
+<p>
+    <a href="{{ webroot }}/{{ companyIdentifier }}/rooster2/ruilverzoek?hash={{ shiftSwapRequest.hash }}&acceptationStatus=false">Afkeuren</a>
+    <a href="{{ webroot }}/{{ companyIdentifier }}/rooster2/ruilverzoek?hash={{ shiftSwapRequest.hash }}&acceptationStatus=true">Goedkeuren</a>
+</p>
+
+{% if shiftSwapRequest.applicantMessage %}
+    <p>
+        Bericht:
+        <br>
+        {{ shiftSwapRequest.applicantMessage }}
+    </p>
+{% endif %}

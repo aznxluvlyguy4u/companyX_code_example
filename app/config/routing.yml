@@ -1,0 +1,14 @@
+#companyX:
+#    resource: "@CompanyXBundle/Controller/"
+#    type:     annotation
+#    prefix:   /
+
+app:
+    resource: '@AppBundle/Controller/'
+    type:     annotation
+    defaults:
+        _format: json
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
+    prefix:   /docs

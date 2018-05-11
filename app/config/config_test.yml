@@ -1,0 +1,45 @@
+imports:
+    - { resource: config_dev.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        enabled: true
+        collect: false
+
+web_profiler:
+    toolbar: false
+    intercept_redirects: false
+
+swiftmailer:
+    disable_delivery: true
+#    delivery_addresses: ['vul.eigen@email.in']
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver:   '%database_driver%'
+                host:     '%database_host%'
+                port:     '%database_port%'
+                dbname:   '%default_shared_database_name%'
+                user:     '%database_user%'
+                password: '%database_password%'
+                charset:  '%database_charset%'
+            customer:
+                driver:   '%database_driver%'
+                host:     '%database_host%'
+                port:     '%database_port%'
+                dbname:   '%test_database_name%'
+                user:     '%database_user%'
+                password: '%database_password%'
+                charset:  '%database_charset%'
+
+# NoxLogic RateLimit bundle configuration
+# documentation:
+noxlogic_rate_limit:
+    enabled:              false

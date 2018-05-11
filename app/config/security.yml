@@ -1,0 +1,82 @@
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+    role_hierarchy:
+        ROLE_SUPER_USER: [
+            ROLE_ADMINISTRATORS,
+            ROLE_COMMUNICATION_CENTRE,
+            ROLE_CREATING_SCHEDULES,
+            ROLE_ALL_RIGHTS,
+            ROLE_NEWSLETTER_CREATION,
+            ROLE_HOURS,
+            ROLE_HOURS_REGISTER,
+            ROLE_HOURS_ACCORD,
+            ROLE_VACATION_MANAGEMENT,
+            ROLE_EMPLOYEES,
+            ROLE_EMPLOYEES_LOOKING_NOT_EDITING,
+            ROLE_EMPLOYEES_CONTROL,
+            ROLE_MANAGEMENT,
+            ROLE_MANAGEMENT_DASHBOARD,
+            ROLE_MANAGEMENT_DIARY,
+            ROLE_MANAGEMENT_AGENDA,
+            ROLE_MANAGEMENT_FORECAST,
+            ROLE_MANAGEMENT_EVERYTHING,
+            ROLE_REPORTS,
+            ROLE_CREATING_PERMISSIONS,
+            ROLE_SHOW_SALARIES,
+            ROLE_HIDE_SALARIES,
+            ROLE_GROUP_PERMISSIONS,
+            ROLE_GROUP_PERMISSIONS_FOR_EMPLOYEES,
+            ROLE_GROUP_PERMISSIONS_FOR_VISITOR,
+            ROLE_GROUP_PERMISSIONS_FOR_EVERYONE,
+            ROLE_GROUP_PERMISSIONS_FOR_PRE_MEMBER,
+            ROLE_TELEPHONELIST_ACCESS]
+
+    encoders:
+        AppBundle\Entity\Client:
+            id: 'AppBundle\Security\CompanyXPasswordEncoder'
+
+        companyX_super_user_cookie_encoder:
+            id: 'AppBundle\Security\CompanyXSuperUserCookieEncoder'
+
+    # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    providers:
+        companyX_user_provider:
+            entity:
+                class: AppBundle:Client
+#                property: username
+                manager_name: customer
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        refresh:
+            pattern:  ^/api/v1/auth/refresh-token
+            stateless: true
+            anonymous: true
+
+        api:
+            pattern: ^(?:(?!^\/docs$|^\/docs\/$|^\/api\/v1\/auth$|^\/api\/v1\/auth\/super-user$|^\/api\/v1\/auth\/switch-user$).)*$
+            security: true
+            stateless: true
+            guard:
+                authenticators:
+                    - 'AppBundle\Security\TokenAuthenticatorGuard'
+
+        default:
+            anonymous: ~
+            logout_on_user_change: true
+
+    access_control:
+        -   { path: ^/docs\/$, allow_if: "request.getClientIp() in ['127.0.0.1', '172.18.0.1', '172.17.0.1']" }
+
+            # activate different ways to authenticate
+
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+            #http_basic: ~
+
+            # https://symfony.com/doc/current/security/form_login_setup.html
+            #form_login: ~
